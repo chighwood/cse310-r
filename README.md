@@ -3,13 +3,11 @@
 
 # Overview
 
-{Important! Do not say in this section that this is college assignment. Talk about what you are trying to accomplish as a software engineer to further your learning.}
+The program I wrote was a simple one of cleaning and processing data files before they are used for analysis. This code is mainly for the csv I have uploaded but with a couple changes, it can work for any csv file you might have.
 
-{Provide a description of the software that you wrote to demonstrate the R language.}
+I wrote this software to help me understand how R works and what it can be used for. There are many different ways to analyze data with R and I am looking forward to knowing how to do that.
 
-{Describe your purpose for writing this software.}
-
-{Provide a link to your YouTube demonstration. It should be a 4-5 minute demo of the software running and a walkthrough of the code. Focus should be on sharing what you learned about the language syntax.}
+# Video of code example
 
 [Software Demo Video](http://youtube.link.goes.here)
 
@@ -27,8 +25,5 @@ This project was pretty simple so I only used R for the language with my file be
 
 # Future Work
 
-{Make a list of things that you need to fix, improve, and add in the future.}
+- Add another CSV file that works with the coding
 
-- Item 1
-- Item 2
-- Item 3
