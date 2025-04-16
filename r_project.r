@@ -1,120 +1,120 @@
-# Import readr, janitor, and dplyr to use in code
-
+# Load required libraries
 library(readr)
 library(janitor)
 library(dplyr)
 
-# Keeps the numeric data from using scientific notation
-
+# Avoid scientific notation for large numbers
 options(scipen = 999)
 
-# Read CSV file into a variable named data
-
+# Read the dataset
 data <- read_csv("data/salaries.csv")
 
-# Create a clean copy of data
+# Clean and format the column names
+clean_data <- data %>%
+  clean_names()
 
-clean_data <- data
-clean_data <- clean_names(clean_data)
-
-# Add new column named employee_id and add it to the front of the table
-
+# Add employee_id and move it to the front
 clean_data <- clean_data %>%
-    mutate(employee_id = row_number()) %>%
-    select(employee_id, everything())
+  mutate(employee_id = row_number()) %>%
+  select(employee_id, everything())
 
-# Remove rows with missing data by using na.omit
-
+# Remove rows with missing values
 clean_data <- na.omit(clean_data)
 
-# Quick summary of the first rows, the structure of the dataframe, and the summary of the numerical statistics
+# Preview data
 head(data)
 str(data)
 summary(data)
 
-# Imput mean values if salary is NA is present for any of the rows
-
+# Impute missing salary values in original dataset (not clean_data)
 mean_salary <- mean(clean_data$salary, na.rm = TRUE)
-data$salary <- ifelse(is.na(data$salary), mean(data$salary, na.rm = TRUE), data$salary)
+data$salary <- ifelse(is.na(data$salary), mean_salary, data$salary)
 
-# Convert data types depending on the data itself
-# Those may include: date, factor, and numeric 
+# Convert column types appropriately
+clean_data <- clean_data %>%
+  mutate(
+    work_year = as.numeric(work_year),
+    experience_level = as.factor(experience_level),
+    employment_type = as.factor(employment_type),
+    job_title = as.factor(job_title),
+    salary = as.numeric(salary),
+    salary_currency = as.factor(salary_currency),
+    salary_in_usd = as.numeric(salary_in_usd),
+    employee_residence = as.factor(employee_residence),
+    remote_ratio = as.numeric(remote_ratio),
+    company_location = as.factor(company_location),
+    company_size = as.factor(company_size)
+  )
 
-clean_data$work_year <- as.numeric(clean_data$work_year)
-clean_data$experience_level <- as.factor(clean_data$experience_level)
-clean_data$employment_type <- as.factor(clean_data$employment_type)
-clean_data$job_title <- as.factor(clean_data$job_title)
-clean_data$salary <- as.numeric(clean_data$salary)
-clean_data$salary_currency <- as.factor(clean_data$salary_currency)
-clean_data$salary_in_usd <- as.numeric(clean_data$salary_in_usd)
-clean_data$employee_residence <- as.factor(clean_data$employee_residence)
-clean_data$remote_ratio <- as.numeric(clean_data$remote_ratio)
-clean_data$company_location <- as.factor(clean_data$company_location)
-clean_data$company_size <- as.factor(clean_data$company_size)
-
-#Print changes so they are visible to the user
+# Show structure of cleaned data
 str(clean_data)
 
-# Remove any duplicates of data that could affect the integrity
-
+# Remove duplicates
 clean_data <- clean_data[!duplicated(clean_data), ]
 
-# Loops through the data to find the standard deviation of the salaries
-
+# Compute standard deviation of salaries
 for (col_name in c("salary")) {
-    std_dev <- sd(clean_data[[col_name]])
-    cat("Standard deviation of", col_name, "is:", round(std_dev, 2), "\n")
-    }
+  std_dev <- sd(clean_data[[col_name]])
+  cat("Standard deviation of", col_name, "is:", round(std_dev, 2), "\n")
+}
 
-# Loops through the data to find the lowest salaries
-
-# Sort dataframe by salary (ascending)
+# Find top 5 lowest salaries
 lowest_salaries <- clean_data[order(clean_data$salary), ]
-
-# Get top 5
 top5_lowest <- head(lowest_salaries, 5)
 
-# Display
 cat("\nTop 5 Lowest Salaries:\n")
-for (i in 1:nrow(top5_lowest)) {
-    cat(top5_lowest$job_title[i], "- $", formatC(top5_lowest$salary[i], format = "f", big.mark = ",", digits = 0), "\n")
-    }
+for (i in seq_len(nrow(top5_lowest))) {
+  cat(
+    top5_lowest$job_title[i], "- $",
+    formatC(top5_lowest$salary[i], format = "f", big.mark = ",", digits = 0),
+    "\n"
+  )
+}
 
-# Loops through the data to find the top highest salaries
-
-# Sort dataframe by salary (descending)
+# Find top 5 highest salaries
 highest_salaries <- clean_data[order(-clean_data$salary), ]
-
-# Get top 5
 top5_highest <- head(highest_salaries, 5)
 
-# Display
 cat("\nTop 5 Highest Salaries:\n")
-for (i in 1:nrow(top5_highest)) {
-    cat(top5_highest$job_title[i], "- $", formatC(top5_highest$salary[i], format = "f", big.mark = ",", digits = 0), "\n")
-    }
+for (i in seq_len(nrow(top5_highest))) {
+  cat(
+    top5_highest$job_title[i], "- $",
+    formatC(top5_highest$salary[i], format = "f", big.mark = ",", digits = 0),
+    "\n"
+  )
+}
 
-# Get the top 5 employee locations by %
-
-# Count number of employees per country
+# Calculate top 5 employee locations by percentage
 location_counts <- table(clean_data$employee_residence)
-
-# Sort in descending order
 sorted_locations <- sort(location_counts, decreasing = TRUE)
-
-# Get top 5
 top5_locations <- head(sorted_locations, 5)
 
-# Convert to percentage
 total_employees <- sum(location_counts)
 percentages <- round((top5_locations / total_employees) * 100, 2)
 
-# Display
 cat("Top 5 Employee Locations by Percentage:\n")
-for (i in 1:length(percentages)) {
-    cat(names(percentages)[i], ":", percentages[i], "%\n")
-    }
+for (i in seq_along(percentages)) {
+  cat(names(percentages)[i], ":", percentages[i], "%\n")
+}
 
-# Save clean file to a new csv file with updated information
+# Additional analysis: average salary by company size
+avg_salary_by_company_size <- clean_data %>%
+  group_by(company_size) %>%
+  summarize(avg_salary = round(mean(salary, na.rm = TRUE), 2)) %>%
+  arrange(desc(avg_salary))
 
+cat("\nAverage Salary by Company Size:\n")
+print(as.data.frame(avg_salary_by_company_size))
+
+# Additional analysis: average salary by job title
+top_avg_job_titles <- clean_data %>%
+  group_by(job_title) %>%
+  summarize(avg_salary = mean(salary, na.rm = TRUE)) %>%
+  arrange(desc(avg_salary)) %>%
+  head(5)
+
+cat("\nTop 5 Job Titles by Average Salary:\n")
+print(as.data.frame(top_avg_job_titles))
+
+# Save cleaned data to new CSV file
 write.csv(clean_data, "data/cleaned_salaries.csv", row.names = FALSE)
