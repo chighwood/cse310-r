@@ -9,7 +9,7 @@ I wrote this software to help me understand how R works and what it can be used 
 
 # Video of code example
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://youtu.be/-70KBdDWPQA)
 
 # Development Environment
 
